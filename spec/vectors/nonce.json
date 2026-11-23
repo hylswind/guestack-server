@@ -1,0 +1,42 @@
+{
+  "description": "nonce = b64u(SHA-256(label ‖ thumbprint)), thumbprint = the 32 raw bytes of the RFC 7638 SHA-256 thumbprint of the user's P-256 JWK (thumbprint_input is the canonical JSON that is hashed).",
+  "label": "guestack/nonce/v1\u0000",
+  "cases": [
+    {
+      "jwk": {
+        "crv": "P-256",
+        "kty": "EC",
+        "x": "cqS9FpwJDlEaU1gB_SoWX5pSLUeD5p2otP-tj6tpMPM",
+        "y": "SfVEJBgjlW4bE09gmcSPkvcOUpQGHU78Yy87wxOKnfo"
+      },
+      "thumbprint_input": "{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"cqS9FpwJDlEaU1gB_SoWX5pSLUeD5p2otP-tj6tpMPM\",\"y\":\"SfVEJBgjlW4bE09gmcSPkvcOUpQGHU78Yy87wxOKnfo\"}",
+      "thumbprint_hex": "60777ce1b00f1a076c931185797f7a0cf12c9a69ebc03d9048ce02bded610da6",
+      "thumbprint_b64u": "YHd84bAPGgdskxGFeX96DPEsmmnrwD2QSM4Cve1hDaY",
+      "nonce": "8IIaLURpSPeOILv5jwTJWwAXyuiGO6FwGBx7vXXipX4"
+    },
+    {
+      "jwk": {
+        "crv": "P-256",
+        "kty": "EC",
+        "x": "ImN_BAtf823Jd_0Ur_GPogpPs0S-aluEra2H7nSrUkQ",
+        "y": "YI7P4FlxZeovZBxP-z0XIbH-TmtdmRFQWq9z26FmgEg"
+      },
+      "thumbprint_input": "{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"ImN_BAtf823Jd_0Ur_GPogpPs0S-aluEra2H7nSrUkQ\",\"y\":\"YI7P4FlxZeovZBxP-z0XIbH-TmtdmRFQWq9z26FmgEg\"}",
+      "thumbprint_hex": "16dc05846372a33d00bd42fcb38b41a2e7605580d607863bc4b10db07b3f584a",
+      "thumbprint_b64u": "FtwFhGNyoz0AvUL8s4tBoudgVYDWB4Y7xLENsHs_WEo",
+      "nonce": "1nBe1JhB6VSptIwmBmg3n_kn9Rdw2Npg3HqYNmro92Y"
+    },
+    {
+      "jwk": {
+        "crv": "P-256",
+        "kty": "EC",
+        "x": "fCPQcEJJeHTsuOk2gn_8YSawx1rfUhz9VPQIsH_tn2Y",
+        "y": "sE0lbvWzNiYvLYhkxTo_MwDVph2cSi4Jwk_zzQUe594"
+      },
+      "thumbprint_input": "{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"fCPQcEJJeHTsuOk2gn_8YSawx1rfUhz9VPQIsH_tn2Y\",\"y\":\"sE0lbvWzNiYvLYhkxTo_MwDVph2cSi4Jwk_zzQUe594\"}",
+      "thumbprint_hex": "11ab4aa3ca96092a52ca673157f1ef95536ce50d05568d39d2b6455887d0de31",
+      "thumbprint_b64u": "EatKo8qWCSpSymcxV_HvlVNs5Q0FVo050rZFWIfQ3jE",
+      "nonce": "0Vz01-pGlIVaaBsCuPmiT1gYjfSNdH92x0haWvnLxlA"
+    }
+  ]
+}

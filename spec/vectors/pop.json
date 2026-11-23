@@ -1,0 +1,65 @@
+{
+  "description": "pop = compact JWS signed with the user key. Header exactly {alg: ES256, typ: guestack-reg+jwt}; payload exactly {h}, h = b64u(SHA-256(id_token bytes)). Every invalid case yields pop_invalid. ECDSA signatures are randomised: verify valid entries, do not compare bytes.",
+  "user_private_d_b64u": "4u3CHjSyAczkuRrs27UWwr53BAbfQPU5io2EE5Vhu5k",
+  "user_jwk": {
+    "crv": "P-256",
+    "kty": "EC",
+    "x": "cqS9FpwJDlEaU1gB_SoWX5pSLUeD5p2otP-tj6tpMPM",
+    "y": "SfVEJBgjlW4bE09gmcSPkvcOUpQGHU78Yy87wxOKnfo"
+  },
+  "id_token": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJ2ZWN0b3IifQ.c2lnbmF0dXJl",
+  "h": "2GCviZJUXcE9e6rElGbKzJrSufJLnp1WMeTwuiLS7b4",
+  "valid": [
+    "eyJhbGciOiJFUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXJlZytqd3QifQ.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiNCJ9.l3haUujPGVKAfgEE-YzDZCUo1aWg-HruTJIQO1wWozjMA4inNmujXOYGoMbbwZAK7c4yCpE0ugL9nXajiXB3pw"
+  ],
+  "invalid": [
+    {
+      "reason": "signed by another key",
+      "pop": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXJlZytqd3QifQ.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiNCJ9.ycadHJnIz1Lr60FHJYRGMpWH5mqnKHwooxXgRMK0yPSG3QGrEZG-lby4Cff0AJgCTvbagqaiNzDU2q3bUgP7vQ"
+    },
+    {
+      "reason": "h of another id_token",
+      "pop": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXJlZytqd3QifQ.eyJoIjoiVkFNeHNCb2l5TnZMQ2w1cjYxV1U4ektaQkdIWWJicmI4Y1RsT0loQU10NCJ9.oC6aPOAX1KgCz0MWXuNZ-me9sKom6HFlHqyFCLcJWB26fPC4ISnCGIjX-frQi0YQXH1mYfbmMASW6ahIHHDEHA"
+    },
+    {
+      "reason": "typ of an RP proof",
+      "pop": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXByb29mK2p3dCJ9.eyJjIjoiQUFBQUFBQUFBQUFBQUFBQUFBQUFBQSIsImF1ZCI6Imh0dHBzOi8vcnAuZXhhbXBsZSJ9.VrB_NAzE8iqPOW4Gn5w_h4DEnbrwRBGvJsUlLSCKSqpBWYey9IlRUzPJFIt2rzl9B25o_xVW7uBjgGsCvIwV9g"
+    },
+    {
+      "reason": "typ of an RP proof with h payload",
+      "pop": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXByb29mK2p3dCJ9.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiNCJ9.LJ8VrpDIIqYs6mGdbOmUM9VKwccByyjK3PIUrS_R0ZL-m9GtZb09sQUZSSTVa_xGIzwV9PNHomszzsO8tzfsWw"
+    },
+    {
+      "reason": "typ missing",
+      "pop": "eyJhbGciOiJFUzI1NiJ9.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiNCJ9.h1oPdgYXgyV0Yk4psWvYu4vIJYNlQG4LfacnsEJvtW3YB-3MuarQ1KKaiUmCDPYrESVkx2uJCPzfOhCQPbw9mQ"
+    },
+    {
+      "reason": "extra header member",
+      "pop": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXJlZytqd3QiLCJraWQiOiJ4In0.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiNCJ9.XOKArflH83DnWjlJ81zJd1vB3bpXpZNf-wLhwbp-iYDd8mb8mUWNWM0Kz-Aeb5ygpIN77v_abtnQ7AeNwT_Rpg"
+    },
+    {
+      "reason": "extra payload member",
+      "pop": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXJlZytqd3QifQ.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiNCIsImlhdCI6MX0.zsqe0XAeTrd5spssfJ8UGodZoKWndo3qKyFnFqs4uhRNYOj8Wmh_vEV0VCdeZqEFsLOS9YWsfDtwP9R9B9MGcQ"
+    },
+    {
+      "reason": "h padded",
+      "pop": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXJlZytqd3QifQ.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiND0ifQ.DOYsqkxUg1nZkQ3EX12itqkXvDY0XuJwBmfexjYBMn2KBUDYR2UDcHQw717uG5c2dYPRypEkYdEvnbwX2QWLnw"
+    },
+    {
+      "reason": "alg none",
+      "pop": "eyJhbGciOiJub25lIiwidHlwIjoiZ3Vlc3RhY2stcmVnK2p3dCJ9.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiNCJ9."
+    },
+    {
+      "reason": "alg HS256",
+      "pop": "eyJhbGciOiJIUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXJlZytqd3QifQ.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiNCJ9.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    {
+      "reason": "signature not raw r||s (DER)",
+      "pop": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXJlZytqd3QifQ.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiNCJ9.MEYCIQD0vvYZbRfVIZkKl_s8zE1c9dnOwuE3G289_K3TkjZacwIhANKVScJrWemORVyFZi-NhaHEWlwvnHP0o3GxTTaLnLf8"
+    },
+    {
+      "reason": "two parts",
+      "pop": "eyJhbGciOiJFUzI1NiIsInR5cCI6Imd1ZXN0YWNrLXJlZytqd3QifQ.eyJoIjoiMkdDdmlaSlVYY0U5ZTZyRWxHYkt6SnJTdWZKTG5wMVdNZVR3dWlMUzdiNCJ9"
+    }
+  ]
+}

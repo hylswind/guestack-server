@@ -1,0 +1,126 @@
+{
+  "description": "guest_id = UUIDv8 from HMAC-SHA256(S, label ‖ phone): first16 = hmac[0:16]; after_bits = first16 with b[6] = (b[6] & 0x0f) | 0x80 and b[8] = (b[8] & 0x3f) | 0x80; guest_id = after_bits as lowercase 8-4-4-4-12. phone is already normalised (see phone.json). Phone policy is not applied here.",
+  "label": "guestack/guest-id/v1\u0000",
+  "cases": [
+    {
+      "secret_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "phone": "+447700900456",
+      "hmac_hex": "a6b1b9be3e17857e4108bfa6d137adcb99020b7c39f79b28bd15d9d1148d6db3",
+      "first16_hex": "a6b1b9be3e17857e4108bfa6d137adcb",
+      "after_bits_hex": "a6b1b9be3e17857e8108bfa6d137adcb",
+      "guest_id": "a6b1b9be-3e17-857e-8108-bfa6d137adcb"
+    },
+    {
+      "secret_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "phone": "+15550001234",
+      "hmac_hex": "18eccaeeda151226887b62e8230e0c8ef91dea657a2e5b9279d5deb1cb0f0d9b",
+      "first16_hex": "18eccaeeda151226887b62e8230e0c8e",
+      "after_bits_hex": "18eccaeeda158226887b62e8230e0c8e",
+      "guest_id": "18eccaee-da15-8226-887b-62e8230e0c8e"
+    },
+    {
+      "secret_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "phone": "+447700900123",
+      "hmac_hex": "22b0b700fae9d2c1f99343a5b6554fe021334298bafc065f97a5ba3f8bc829e4",
+      "first16_hex": "22b0b700fae9d2c1f99343a5b6554fe0",
+      "after_bits_hex": "22b0b700fae982c1b99343a5b6554fe0",
+      "guest_id": "22b0b700-fae9-82c1-b993-43a5b6554fe0"
+    },
+    {
+      "secret_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "phone": "+12345",
+      "hmac_hex": "1514f70aaa6c5bdfe7c7f503ad4bb8f9f08eeb5409dbc29a0d52cdc2749366d6",
+      "first16_hex": "1514f70aaa6c5bdfe7c7f503ad4bb8f9",
+      "after_bits_hex": "1514f70aaa6c8bdfa7c7f503ad4bb8f9",
+      "guest_id": "1514f70a-aa6c-8bdf-a7c7-f503ad4bb8f9"
+    },
+    {
+      "secret_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "phone": "+888012345678",
+      "hmac_hex": "8354195c1c108ff5d0bb1126735c7e7e867c40f237d361b4956328a061bf4ae6",
+      "first16_hex": "8354195c1c108ff5d0bb1126735c7e7e",
+      "after_bits_hex": "8354195c1c108ff590bb1126735c7e7e",
+      "guest_id": "8354195c-1c10-8ff5-90bb-1126735c7e7e"
+    },
+    {
+      "secret_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "phone": "+447700900456",
+      "hmac_hex": "e5cc839a7e828f168e263f8ae3bc8de37da368a8f5fa48a2ed1e0a21664ada1a",
+      "first16_hex": "e5cc839a7e828f168e263f8ae3bc8de3",
+      "after_bits_hex": "e5cc839a7e828f168e263f8ae3bc8de3",
+      "guest_id": "e5cc839a-7e82-8f16-8e26-3f8ae3bc8de3"
+    },
+    {
+      "secret_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "phone": "+15550001234",
+      "hmac_hex": "d97a22f948606b532c5e341d30966c636a5fc19b3d5785da63dee1a337ac4d55",
+      "first16_hex": "d97a22f948606b532c5e341d30966c63",
+      "after_bits_hex": "d97a22f948608b53ac5e341d30966c63",
+      "guest_id": "d97a22f9-4860-8b53-ac5e-341d30966c63"
+    },
+    {
+      "secret_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "phone": "+447700900123",
+      "hmac_hex": "6ceb157f4ac9565beafac7ccfc2bbf8a0e0f518a1fc97f4b6eb15548132a433c",
+      "first16_hex": "6ceb157f4ac9565beafac7ccfc2bbf8a",
+      "after_bits_hex": "6ceb157f4ac9865baafac7ccfc2bbf8a",
+      "guest_id": "6ceb157f-4ac9-865b-aafa-c7ccfc2bbf8a"
+    },
+    {
+      "secret_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "phone": "+12345",
+      "hmac_hex": "d82c090111c52f7a05160a6d5aa25719ffa8308cf66b6554f26926d8f48a0ec7",
+      "first16_hex": "d82c090111c52f7a05160a6d5aa25719",
+      "after_bits_hex": "d82c090111c58f7a85160a6d5aa25719",
+      "guest_id": "d82c0901-11c5-8f7a-8516-0a6d5aa25719"
+    },
+    {
+      "secret_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "phone": "+888012345678",
+      "hmac_hex": "e564f0534dec5255e3d21fc57c17da2629bb784c9cee5ed4b9f3c850cd90121b",
+      "first16_hex": "e564f0534dec5255e3d21fc57c17da26",
+      "after_bits_hex": "e564f0534dec8255a3d21fc57c17da26",
+      "guest_id": "e564f053-4dec-8255-a3d2-1fc57c17da26"
+    },
+    {
+      "secret_hex": "3fb7d0957be271a0b38f9e5f36f5bedc6b1085619190207dada89a5d93302a85",
+      "phone": "+447700900456",
+      "hmac_hex": "c3b3e3b0c0ae8c7e154588c36c30d9e15167999d25131f05176f5894a28beca0",
+      "first16_hex": "c3b3e3b0c0ae8c7e154588c36c30d9e1",
+      "after_bits_hex": "c3b3e3b0c0ae8c7e954588c36c30d9e1",
+      "guest_id": "c3b3e3b0-c0ae-8c7e-9545-88c36c30d9e1"
+    },
+    {
+      "secret_hex": "3fb7d0957be271a0b38f9e5f36f5bedc6b1085619190207dada89a5d93302a85",
+      "phone": "+15550001234",
+      "hmac_hex": "4eff5eef223185b7fda23ea70453832faede62725aa32ef23cbaef9136419155",
+      "first16_hex": "4eff5eef223185b7fda23ea70453832f",
+      "after_bits_hex": "4eff5eef223185b7bda23ea70453832f",
+      "guest_id": "4eff5eef-2231-85b7-bda2-3ea70453832f"
+    },
+    {
+      "secret_hex": "3fb7d0957be271a0b38f9e5f36f5bedc6b1085619190207dada89a5d93302a85",
+      "phone": "+447700900123",
+      "hmac_hex": "0a79e633df25264028d14141a5d2011cd548735e78ccc6e4e7dc9a3fe194823c",
+      "first16_hex": "0a79e633df25264028d14141a5d2011c",
+      "after_bits_hex": "0a79e633df258640a8d14141a5d2011c",
+      "guest_id": "0a79e633-df25-8640-a8d1-4141a5d2011c"
+    },
+    {
+      "secret_hex": "3fb7d0957be271a0b38f9e5f36f5bedc6b1085619190207dada89a5d93302a85",
+      "phone": "+12345",
+      "hmac_hex": "9ddd6dd45ac1e8cecf5b51d26d3d9a58a06400a8399c9a87dcc6d70b7913b427",
+      "first16_hex": "9ddd6dd45ac1e8cecf5b51d26d3d9a58",
+      "after_bits_hex": "9ddd6dd45ac188ce8f5b51d26d3d9a58",
+      "guest_id": "9ddd6dd4-5ac1-88ce-8f5b-51d26d3d9a58"
+    },
+    {
+      "secret_hex": "3fb7d0957be271a0b38f9e5f36f5bedc6b1085619190207dada89a5d93302a85",
+      "phone": "+888012345678",
+      "hmac_hex": "3fb87ca42763d13d8b35ac104538cd17fb910683185872104c878b47fbfbd287",
+      "first16_hex": "3fb87ca42763d13d8b35ac104538cd17",
+      "after_bits_hex": "3fb87ca42763813d8b35ac104538cd17",
+      "guest_id": "3fb87ca4-2763-813d-8b35-ac104538cd17"
+    }
+  ]
+}

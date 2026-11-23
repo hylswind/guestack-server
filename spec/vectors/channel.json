@@ -1,0 +1,53 @@
+{
+  "description": "Request: enc_request = hdr ‖ enc ‖ ct, HPKE base mode DHKEM(P-256,HKDF-SHA256)/HKDF-SHA256/AES-256-GCM, info = \"guestack/channel/v1\" ‖ 0x00 ‖ hdr, empty aad. Response: secret = Export(response_export_context, 32); prk = HKDF-Extract(salt = enc ‖ response_nonce, ikm = secret); key = Expand(prk, \"key\", 32); aead nonce = Expand(prk, \"nonce\", 12); enc_response = response_nonce ‖ AES-256-GCM(key, nonce, response, aad empty). enc_request was produced with a random ephemeral key: decrypt it, do not try to reproduce it. enc_response is exact for the given response_nonce.",
+  "recipient_sk_hex": "4469316e06d609890168877f3c8ece7d4951be623a757692065fda1d8be7fe1f",
+  "recipient_pk_hex": "042c0256f51b11acbf8fe7ad892fb4df1281c1c3eef475ba17c4c7d230324de85308f584169e0d942b1d3d37e1d11536b66e0bced9ded951a74f0637e258292f63",
+  "hpke_pk": "BCwCVvUbEay_j-etiS-03xKBwcPu9HW6F8TH0jAyTehTCPWEFp4NlCsdPTfh0RU2tm4Lztne2VGnTwY34lgpL2M",
+  "hdr_hex": "01001000010002",
+  "info_hex": "677565737461636b2f6368616e6e656c2f76310001001000010002",
+  "response_export_context": "guestack/channel/v1 response",
+  "cases": [
+    {
+      "request": "{\"method\":\"register\",\"params\":{}}",
+      "enc_request_hex": "0100100001000204c372256767b3275e5eb6f846bfdf3c3f9b3a8cf771d592e555b0f10bfb412101dee5e972967adcbf8675c3821fb873a55df775d7cb7f493cad0b62655cc28399ec3adc07f9dad1b42126efa44f16d52a2411b3c2b79878337a6d817c212458446dbcb91fc758531f5df47650d8d79b08a2",
+      "response_secret_hex": "3584c65eb35cfe183b2fc8c5ad32108b2fd34371475556cae52a0552012451ce",
+      "response_nonce_hex": "0101010101010101010101010101010101010101010101010101010101010101",
+      "response_key_hex": "8811c09e9be8041de0476c5f78e4f8d5419aba7f4cb112ce83bc5718e3d84f73",
+      "response_aead_nonce_hex": "5ac26c3d387746b15575cf1c",
+      "response": "{\"ok\":false,\"error\":\"bad_request\"}",
+      "enc_response_hex": "01010101010101010101010101010101010101010101010101010101010101014437bb386e3b767efaa599bc511a5b2341edae5fc7b2023a9ec627af1f316ccc811f99d8747873bb6aca98c95b6279149699"
+    },
+    {
+      "request": "{\"method\":\"register\",\"params\":{\"id_token\":\"a.b.c\"}}",
+      "enc_request_hex": "0100100001000204f6093b71ab43af8f32902721c1e8471322b1ed8edb262e29b50b68edd22b6c459e1af7e92f3299a97b6143e3e2704e4e044afa35aed1fff41248c848feb9c84a2967cff143062a1a6da3e7e4ec556071103c6dbea7088c7c2446832bb6c4635b55a4d6d89f308408807fa3578d33be262e014a9e1d4979f98533f3ea582835334f1e5e",
+      "response_secret_hex": "b338343d2ad607208dbbba231132d807e90d774019644eaa0a968a0908f8ca7b",
+      "response_nonce_hex": "0202020202020202020202020202020202020202020202020202020202020202",
+      "response_key_hex": "4c4b5d75fbe85005c723a8540530cde0ddc95de9416f74425109d7765c25a3fb",
+      "response_aead_nonce_hex": "3f4b1ba9ff8b5634f2f48513",
+      "response": "{\"ok\":true,\"result\":{\"identity\":\"x.y.z\"}}",
+      "enc_response_hex": "02020202020202020202020202020202020202020202020202020202020202021f580c3b1bc81dfaecdedf156dbe89a420e7f9846206136a9fe49610d3b52abaf586424282ecf299db616c62092b2629360ddc43af9b0ce9da"
+    }
+  ],
+  "invalid_requests": [
+    {
+      "reason": "ciphertext tag modified",
+      "enc_request_hex": "0100100001000204c372256767b3275e5eb6f846bfdf3c3f9b3a8cf771d592e555b0f10bfb412101dee5e972967adcbf8675c3821fb873a55df775d7cb7f493cad0b62655cc28399ec3adc07f9dad1b42126efa44f16d52a2411b3c2b79878337a6d817c212458446dbcb91fc758531f5df47650d8d79b08a3"
+    },
+    {
+      "reason": "unknown key_id",
+      "enc_request_hex": "0200100001000204c372256767b3275e5eb6f846bfdf3c3f9b3a8cf771d592e555b0f10bfb412101dee5e972967adcbf8675c3821fb873a55df775d7cb7f493cad0b62655cc28399ec3adc07f9dad1b42126efa44f16d52a2411b3c2b79878337a6d817c212458446dbcb91fc758531f5df47650d8d79b08a2"
+    },
+    {
+      "reason": "aead_id AES-128-GCM",
+      "enc_request_hex": "0100100001000104c372256767b3275e5eb6f846bfdf3c3f9b3a8cf771d592e555b0f10bfb412101dee5e972967adcbf8675c3821fb873a55df775d7cb7f493cad0b62655cc28399ec3adc07f9dad1b42126efa44f16d52a2411b3c2b79878337a6d817c212458446dbcb91fc758531f5df47650d8d79b08a2"
+    },
+    {
+      "reason": "truncated before ciphertext",
+      "enc_request_hex": "0100100001000204c372256767b3275e5eb6f846bfdf3c3f9b3a8cf771d592e555b0f10bfb412101dee5e972967adcbf8675c3821fb873a55df775d7cb7f493cad0b62655cc28399"
+    },
+    {
+      "reason": "empty",
+      "enc_request_hex": ""
+    }
+  ]
+}

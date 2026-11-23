@@ -1,0 +1,91 @@
+{
+  "description": "Normalisation of Telegram's phone_number claim and the compile-time phone policy. phone: normalised value used for the guest ID. error: the registration error code.",
+  "rejected_prefixes": [
+    "+888"
+  ],
+  "cases": [
+    {
+      "phone_number": "447700900456",
+      "phone": "+447700900456"
+    },
+    {
+      "phone_number": "+447700900456",
+      "phone": "+447700900456"
+    },
+    {
+      "phone_number": "15550001234",
+      "phone": "+15550001234"
+    },
+    {
+      "phone_number": "12345",
+      "phone": "+12345"
+    },
+    {
+      "phone_number": "123456789012345",
+      "phone": "+123456789012345"
+    },
+    {
+      "phone_number": "888012345678",
+      "phone": "+888012345678",
+      "error": "phone_not_allowed"
+    },
+    {
+      "phone_number": "+888012345678",
+      "phone": "+888012345678",
+      "error": "phone_not_allowed"
+    },
+    {
+      "phone_number": "88812345",
+      "phone": "+88812345",
+      "error": "phone_not_allowed"
+    },
+    {
+      "phone_number": "8880",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": "",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": "+",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": "1234",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": "1234567890123456",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": "++15550001234",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": "+1 555 000 1234",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": "+1-555-0001234",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": "１５５５０００１２３４",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": "1555000123a",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": " 15550001234",
+      "error": "id_token_invalid"
+    },
+    {
+      "phone_number": "15550001234\n",
+      "error": "id_token_invalid"
+    }
+  ]
+}
