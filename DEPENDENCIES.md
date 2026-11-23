@@ -26,6 +26,12 @@ CGO_ENABLED=0 go list -deps ./cmd/guestackd | grep -v '^[a-z/0-9]*$'
 
 The dev build (`-tags dev`) links the same modules plus `internal/devkeys`, `internal/attest/devfake` and the local signer. No third-party module is added for dev.
 
+## Used at run time, not linked
+
+| Program | Why |
+|---------|-----|
+| `nitro-tpm-attest` (package `aws-nitro-tpm-tools`, from the Amazon Linux release current at build time, see [`image/INPUTS.md`](image/INPUTS.md)) | AWS's tool for requesting attestation documents. It is part of the measured image. `internal/attest/nitrotpm` runs it with an empty environment and discards its standard error. Using it avoids a third-party TPM library and a hand-written TPM protocol |
+
 ## Tools only (never linked)
 
 | Module | Why |

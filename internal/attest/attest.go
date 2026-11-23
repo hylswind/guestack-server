@@ -24,8 +24,8 @@ type Provider interface {
 var ErrUnavailable = errors.New("attest: document unavailable")
 
 // RefreshInterval is how often the document is renewed. It must stay well
-// below the leaf certificate's validity (to be measured on a real instance
-// once NitroTPM attestation is implemented; the dev leaf is valid for 3 hours).
+// below the leaf certificate's validity (still to be measured on a real
+// instance; the dev leaf is valid for 3 hours).
 const RefreshInterval = 10 * time.Minute
 
 // Cache holds the current GET /attestation response body.

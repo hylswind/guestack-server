@@ -1,0 +1,20 @@
+[Unit]
+Description=Guestack backend
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/guestackd
+# The only non-root user allowed to open /dev/tpm0.
+User=tss
+Group=tss
+Restart=always
+RestartSec=5
+LimitCORE=0
+# guestackd logs only fixed event names and counters. The serial console is
+# the only way to see them, because the image has no remote access.
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target

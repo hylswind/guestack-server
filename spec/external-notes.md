@@ -8,7 +8,7 @@
 |-------|-------|
 | [Telegram login](#telegram-login) | Checked, including the blocking nonce check |
 | [EC2 instance attestation (NitroTPM)](#ec2-instance-attestation-nitrotpm) | Documentation checked. Open items wait for a real instance |
-| [GitHub artifact attestations](#github-artifact-attestations) | Open |
+| [GitHub artifact attestations](#github-artifact-attestations) | Documentation checked. One open item waits for the first workflow run |
 | [HPKE in Go](#hpke-in-go) | Checked |
 | [No runtime configuration](#no-runtime-configuration) | Checked |
 | [`encoding/json`](#encodingjson) | Accepted behaviour |
@@ -58,29 +58,44 @@
 - Validation: check the chain at the current date, with CRL checks disabled.
 - Requesting a document: `nitro-tpm-attest --public-key … --user-data … --nonce …` (package `aws-nitro-tpm-tools`). For `--public-key`, "Only RSA keys are supported". **Hence the channel key is bound through `user_data`, which carries exactly the 65-byte `hpke_pk` ([`channel.md`](channel.md)). `public_key` is not used.**
 - PCR4 (boot manager code) and PCR12 (UEFI boot binary command line) validate an Attestable AMI booted normally. PCR7 (Secure Boot policy) validates one booted with Secure Boot. KMS condition keys `kms:RecipientAttestation:NitroTPMPCR<n>` exist, and the docs name PCR4, PCR7, PCR12.
-- Root: https://aws-nitro-enclaves.amazonaws.com/AWS_NitroEnclaves_Root-G1.zip, subject `CN=aws.nitro-enclaves, C=US, O=Amazon, OU=AWS`, 30-year lifetime. Published fingerprint `64:1A:03:21:A3:E2:44:EF:E4:56:46:31:95:D6:06:31:7E:D7:CD:CC:3C:17:56:E0:98:93:F3:C6:8F:79:BB:5B`. The AWS page does not name the hash algorithm; its length fits SHA-256.
+- Root: https://aws-nitro-enclaves.amazonaws.com/AWS_NitroEnclaves_Root-G1.zip, subject `CN=aws.nitro-enclaves, C=US, O=Amazon, OU=AWS`, 30-year lifetime. Published fingerprint `64:1A:03:21:A3:E2:44:EF:E4:56:46:31:95:D6:06:31:7E:D7:CD:CC:3C:17:56:E0:98:93:F3:C6:8F:79:BB:5B`. Recomputed on 2026-11-24 from the certificate in the downloaded file: it is the SHA-256 of the DER encoding.
 - Attestable AMI sample: `amazonlinux/kiwi-image-descriptions-examples`, path `al2023/attestable-image-example`. Its `edit_boot_install.sh` runs `nitro-tpm-pcr-compute --image <UKI.efi>` and writes `pcr_measurements.json`.
+
+### The tools in the image
+
+Read on 2026-11-24 in the source of `aws/NitroTPM-Tools` at tag `v1.1.2`, the version of `aws-nitro-tpm-tools` in Amazon Linux release 2023.12.20261117. The image installs the latest release, so a later build can carry a newer version:
+
+- `nitro-tpm-attest --user-data <path>` reads the raw bytes of that path and writes the document to standard output. The backend passes `/dev/stdin`, so nothing touches the disk.
+- The tool reads the device path from `TPM_DEVICE` (default `/dev/tpm0`). The backend runs it with an empty environment.
+- The `tpm2-tss` udev rules let only the user `tss` open `/dev/tpm0`, so `guestackd` runs as `tss`.
+- `nitro-tpm-pcr-compute` emits PCR4, PCR7, and PCR12. Without Secure Boot arguments it computes PCR7 for Secure Boot off with empty key databases.
+- `amazon-ec2-net-utils` reads the instance metadata service, for example in `set-hostname-imds` and `setup-policy-routes`. It is excluded from the image. Its DHCP configuration, `80-ec2.network` at tag `v2.7.7`, is copied unchanged.
+- `amazon-chrony-config` stays in the image, as in the AWS example. It chooses the time sources at boot and every 30 minutes: NTP servers from the DHCP lease if there are any, otherwise the Amazon link-local source and a public Amazon pool, picked with the AWS partition from the instance metadata service. The operator can therefore influence the instance clock, which this design treats as untrusted input.
 
 ### Open
 
-Waiting for a real instance and the image build:
+Waiting for a real instance:
 
-- [ ] Recompute the root fingerprint from the downloaded file, and confirm it is SHA-256.
 - [ ] Leaf certificate validity period. It is not documented, and it sets the backend's refresh interval for `/attestation`.
-- [ ] Output format of `nitro-tpm-attest` (stdout or file, and whether the document is tagged). Whether absent optional fields are `null` or omitted. The dev build emits `null`, so the login page must accept both if real documents differ.
-- [ ] How `--user-data` is passed (raw bytes, hex, or a file), and whether `user_data` arrives in the document unchanged.
-- [ ] Which PCRs to pin for our image (PCR4 + PCR12 for standard boot, plus PCR7 if Secure Boot is used).
+- [ ] Whether the document is tagged, and whether absent optional fields are `null` or omitted. The dev build emits a tagged document with `null`.
+- [ ] Whether `user_data` arrives in the document unchanged.
+- [ ] Whether the PCR4, PCR7, and PCR12 an instance reports equal the computed values. The image uses standard boot, and the AWS documentation names PCR7 only for Secure Boot.
 
 ## GitHub artifact attestations
 
+**Sources:** the README of `actions/attest` v4.2.2 and the `gh attestation verify` source in `cli/cli`, read 2026-11-24.
+
+### Checked
+
+- The action needs the permissions `id-token: write`, `attestations: write`, and `artifact-metadata: write`. Without a predicate input it produces SLSA build provenance.
+- Attestations in private or internal repositories need GitHub Enterprise Cloud. Public repositories use the Sigstore public-good instance.
+- `gh attestation verify` can require the repository (`--repo`), the signing workflow (`--signer-workflow`), the source ref (`--source-ref`), and a GitHub-hosted runner (`--deny-self-hosted-runners`).
+
 ### Open
 
-Before the release workflow is written, confirm these against current GitHub documentation:
+Waiting for the first workflow run:
 
-- [ ] The attestation action and its permissions
-- [ ] The provenance contents
-- [ ] The verification command
-- [ ] Release asset size limits
+- [ ] The JSON path of the source commit used in [`VERIFY.md`](../VERIFY.md), checked against a real attestation.
 
 ## HPKE in Go
 

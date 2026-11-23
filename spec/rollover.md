@@ -9,7 +9,7 @@
 
 ## Boundary
 
-The boundary is 00:00:00 UTC on the 1st of the month. Each release serves exactly one `EPOCH_ID`, and there is no overlap or grace window.
+The boundary is 00:00:00 UTC on the 1st of the month. Each image serves exactly one `EPOCH_ID`, and there is no overlap or grace window.
 
 The page loader picks each month's pages by **the visitor's own clock**. Next month's pages are published in advance and are served as soon as a visitor's clock enters that month. Nothing is switched by hand at the boundary.
 

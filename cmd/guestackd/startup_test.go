@@ -14,8 +14,7 @@ import (
 )
 
 // The production binary fails closed: every misconfiguration exits non-zero
-// with a fixed event, and it cannot start at all until NitroTPM attestation
-// is implemented.
+// with a fixed event.
 func TestProductionStartupFailsClosed(t *testing.T) {
 	bin := buildBinary(t, false, "2026-12")
 	noEpoch := buildBinary(t, false, "")

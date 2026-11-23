@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adapted from the Amazon Linux attestable image example (Apache-2.0). See NOTICE.
+  The root filesystem is erofs under dm-verity, and its hash is inside the unified
+  kernel image that PCR4 measures.
+-->
+<image schemaversion="7.5" name="guestack">
+    <description type="system">
+        <author>Guestack</author>
+        <contact>https://github.com/hylswind/guestack-server</contact>
+        <specification>Attested Guestack backend on Amazon Linux 2023</specification>
+        <license>Apache License 2.0</license>
+    </description>
+    <preferences>
+        <version>1.0.0</version>
+        <packagemanager>dnf</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <rpm-check-signatures>true</rpm-check-signatures>
+        <type
+            image="oem"
+            filesystem="xfs"
+            kernelcmdline="console=ttyS0 rd.shell=0 systemd.getty_auto=false rd.kiwi.verity_options=panic-on-corruption"
+            firmware="uefi"
+            overlayroot="true"
+            overlayroot_write_partition="false"
+            overlayroot_readonly_filesystem="erofs"
+            overlayroot_readonly_partsize="2048"
+            erofscompression="lz4hc,level=12"
+            eficsm="false"
+            verity_blocks="all"
+            bootpartition="false"
+            efipartsize="200"
+            editbootinstall="edit_boot_install.sh">
+        <oemconfig>
+            <oem-resize>false</oem-resize>
+        </oemconfig>
+        <bootloader name="systemd_boot" timeout="0"/>
+        <initrd action="setup">
+            <dracut uefi="true"/>
+        </initrd>
+        <size unit="G">4</size>
+        </type>
+    </preferences>
+
+    <repository priority="2" package_gpgcheck="true" sourcetype="mirrorlist" customize="add-gpg-key.sh">
+            <source path="https://cdn.amazonlinux.com/al2023/core/mirrors/latest/$basearch/mirror.list"/>
+    </repository>
+
+    <packages type="image">
+        <!-- Use ami-minimal-kernel6.12 for kernel6.12 images -->
+        <namedCollection name="core"/>
+        <namedCollection name="ami-minimal"/>
+        <package name="gzip"/>
+        <package name="veritysetup"/>
+        <package name="systemd-boot"/>
+        <package name="tar"/>
+        <package name="cryptsetup"/>
+        <package name="dracut-kiwi-verity"/>
+        <package name="dracut-kiwi-overlay"/>
+        <package name="aws-nitro-tpm-tools"/>
+        <package name="systemd-resolved"/>
+        <package name="amazon-chrony-config"/>
+        <package name="binutils"/>
+        <!-- Don't install these packages -->
+        <ignore name="ec2-hibinit-agent"/>
+        <ignore name="grubby"/>
+        <ignore name="grub2-pc-modules"/>
+        <ignore name="grub2-tools"/>
+        <ignore name="grub2-efi-aa64-ec2"/>
+        <ignore name="grub2-efi-aa64"/>
+        <ignore name="grub2-efi-aa64-modules"/>
+        <ignore name="grub2-efi-x64-ec2"/>
+        <ignore name="grub2-efi-x64"/>
+        <ignore name="grub2-efi-x64-modules"/>
+        <ignore name="firewalld"/>
+        <ignore name="amazon-linux-repo-s3"/>
+        <ignore name="amazon-linux-repo-cdn"/>
+        <!-- Remove operator access by not installing these packages -->
+        <ignore name="openssh-server"/>
+        <ignore name="amazon-ssm-agent"/>
+        <ignore name="cloud-init"/>
+        <ignore name="cloud-init-cfg-ec2"/>
+        <ignore name="update-motd" />
+        <ignore name="ec2-instance-connect"/>
+        <!-- Its tools read the instance metadata service. Its network configuration
+             file is kept, unchanged, in root/etc/systemd/network. -->
+        <ignore name="amazon-ec2-net-utils"/>
+    </packages>
+    <!-- No package manager at run time. Removed after the image is assembled. -->
+    <packages type="delete">
+        <package name="dnf"/>
+        <package name="yum"/>
+        <package name="dnf-plugins-core"/>
+        <package name="dnf-plugin-release-notification"/>
+        <package name="dnf-plugin-support-info"/>
+        <package name="python3-dnf"/>
+        <package name="python3-dnf-plugins-core"/>
+        <package name="rpm-plugin-systemd-inhibit"/>
+        <package name="rpm"/>
+    </packages>
+    <packages type="bootstrap">
+        <package name="system-release"/>
+        <package name="dnf"/>
+        <!-- Ignoring these packages forces the use of the minimal versions -->
+        <ignore name="libcurl"/>
+        <ignore name="curl"/>
+        <ignore name="gnupg2"/>
+    </packages>
+</image>

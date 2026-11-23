@@ -30,13 +30,9 @@ func buildDeps(ctx context.Context) (*deps, safelog.Event, bool) {
 	if err != nil {
 		return nil, safelog.SignerUnavailable, false
 	}
-	provider, err := nitrotpm.New()
-	if err != nil {
-		return nil, safelog.AttestationUnavailable, false
-	}
 	return &deps{
 		listenAddr: listenAddr,
-		attest:     provider,
+		attest:     nitrotpm.New(),
 		signer:     signer,
 		issuerPub:  pub,
 		keys:       telegram.NewFetcher(),

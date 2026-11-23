@@ -7,7 +7,7 @@ Websites receive a pseudonymous **guest ID** instead of a phone number. The same
 This repository contains `guestackd`, the Go service that checks the Telegram login and issues a signed **identity token**, along with the protocol specifications and test vectors that the other Guestack components conform to. It is public so that anyone can audit what runs inside the attested instance.
 
 > [!WARNING]
-> **Not ready for production.** The dev build works end to end. The production build deliberately refuses to start because NitroTPM attestation is not implemented yet. The machine image and release workflow are also still to come.
+> **Not ready for production.** The dev build works end to end. NitroTPM attestation and the machine image exist but have not yet been verified on a real instance.
 
 ## Features
 
@@ -108,7 +108,7 @@ The two builds differ only by the `dev` build tag. There is no runtime switch.
 
 | | Production | Dev (`-tags dev`) |
 |---|---|---|
-| Attestation | NitroTPM (not implemented yet) | Real format, throwaway root |
+| Attestation | NitroTPM, through `nitro-tpm-attest` | Real format, throwaway root |
 | Issuer key | AWS KMS | Local key |
 | Telegram keys | Fetched from Telegram's JWKS | Static dev keys |
 | Environment variables | None | `GUESTACK_LISTEN_ADDR`, `GUESTACK_DEV_SECRET` |
@@ -138,12 +138,17 @@ internal/
 ├── secret/             In-memory secret and guest ID derivation
 ├── telegram/           id_token verification and JWKS fetching
 └── vectors/            Test vector loader
+image/                  KIWI NG description of the attested machine image
 spec/                   Protocol specifications and test vectors
 ```
 
+### Machine image
+
+The image is built only by the manual [`Build image`](.github/workflows/build-image.yml) workflow, on a GitHub-hosted runner. `EPOCH_ID` is written in that workflow file, so each month's build is a commit that changes it. The workflow signs the image's PCR values with GitHub build provenance. See [`image/INPUTS.md`](image/INPUTS.md) for what the build depends on.
+
 ## Auditing this repository
 
-Start with the [specifications](spec/README.md), then check how each property is enforced:
+Start with the [specifications](spec/README.md), then check how each property is enforced. To tie a running backend to a commit of this repository, follow [`VERIFY.md`](VERIFY.md).
 
 | Property | Enforced by |
 |----------|-------------|
