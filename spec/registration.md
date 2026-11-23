@@ -11,18 +11,36 @@ The Telegram `nonce` claim was confirmed with a real login ([`external-notes.md`
 
 ## Flow
 
+```mermaid
+sequenceDiagram
+    autonumber
+    participant B as Login page
+    participant T as Telegram
+    participant G as guestackd
+    participant K as AWS KMS
+
+    B->>G: GET /attestation
+    G-->>B: Attestation document, channel key
+    Note over B: Verify attestation<br/>Generate user key<br/>Compute nonce
+    B->>T: Open login popup with nonce
+    T-->>B: id_token
+    Note over B: Sign pop with user key
+    B->>G: Encrypted register request
+    G->>T: Fetch JWKS (cached)
+    T-->>G: Telegram public keys
+    Note over G: Apply backend rules<br/>Derive guest ID
+    G->>K: Sign identity token
+    K-->>G: Signature
+    G-->>B: Encrypted identity token
 ```
-Browser                              Telegram                 Backend
-  │ generate user key pair (P-256, non-extractable)
-  │ nonce = b64u(SHA-256("guestack/nonce/v1\0" ‖ thumbprint))
-  │ Telegram.Login.auth({client_id, scope:["phone"], nonce}) ─▶│  (popup)
-  │◀── id_token ───────────────────────────────────────────────│
-  │ verify attestation, fetch channel key (channel.md)
-  │ pop = JWS over SHA-256(id_token), signed with the user key
-  │ HPKE{ register: id_token, jwk, pop } ─────────────────────────────▶│
-  │                                    │◀── GET JWKS (cached) ─────────│
-  │◀──────────────────────────── HPKE{ identity } ─────────────────────│
-```
+
+| Stage | Steps | What happens |
+|-------|-------|--------------|
+| **Prepare** | 1–2 | The login page fetches and verifies the attestation ([`channel.md`](channel.md)), generates a non-extractable P-256 user key, and computes the [nonce](#nonce) from it |
+| **Log in** | 3–4 | It calls `Telegram.Login.auth({client_id, scope:["phone"], nonce})` and receives an `id_token` |
+| **Register** | 5 | It signs `pop` over `SHA-256(id_token)` with the user key, then sends `id_token`, `jwk`, and `pop` over HPKE |
+| **Verify** | 6–7 | The backend checks the token against Telegram's JWKS and applies the [backend rules](#backend-rules) |
+| **Issue** | 8–10 | KMS signs the [identity token](identity-token.md), and the backend returns it over HPKE |
 
 The login page requests only the `phone` scope. It treats `id_token` as an opaque string: it does not decode, display, log, or store it.
 
