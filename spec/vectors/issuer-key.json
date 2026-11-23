@@ -1,0 +1,11 @@
+{
+  "description": "Issuer key derivation: a PEM SubjectPublicKeyInfo, and the JWK and kid derived from it. kid = b64u of the RFC 7638 SHA-256 thumbprint. Test key only: its private key is derived from a public label, so it must never be trusted.",
+  "pem": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEvE0lFd8ePafWbgUL0M2rYr3qfqP6\nrm6PmPhgCQaFLeA9TXmD+bjorPeVM8+ws8UYMEp2n5mdFVnAT+wIXJKHaw==\n-----END PUBLIC KEY-----\n",
+  "jwk": {
+    "crv": "P-256",
+    "kty": "EC",
+    "x": "vE0lFd8ePafWbgUL0M2rYr3qfqP6rm6PmPhgCQaFLeA",
+    "y": "PU15g_m46Kz3lTPPsLPFGDBKdp-ZnRVZwE_sCFySh2s"
+  },
+  "kid": "UQ_8GVHJ2LRCWapxg9Qt_ddAdYg-8hgN7T0bOM9sWD0"
+}

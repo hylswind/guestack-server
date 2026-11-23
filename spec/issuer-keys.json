@@ -1,4 +1,0 @@
-{
-  "description": "Production issuer public keys (identity-token.md). The RP SDK bundles these. Empty until the operator's KMS key exists; dev keys are never listed here.",
-  "keys": []
-}

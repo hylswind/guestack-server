@@ -27,6 +27,7 @@ Vectors live in [`spec/vectors/`](vectors).
 | `nonce.json` | RFC 7638 thumbprint input, thumbprint, nonce |
 | `pop.json` | A valid `pop` and invalid ones that must yield `pop_invalid` |
 | `identity-token.json` | Exact header and payload bytes, signing input, a token to verify, DER→raw conversion |
+| `issuer-key.json` | A test issuer key as PEM, with the JWK and `kid` derived from it |
 | `channel.json` | HPKE requests to decrypt, exact encrypted responses, invalid requests |
 | `dev-build.json` | **Not a vector, and not production values.** Dev backend fixtures: the dev attestation root and its SHA-256, dev PCRs, dev Telegram signing keys and client ID, and the dev issuer key |
 
