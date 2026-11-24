@@ -30,7 +30,7 @@ The backend refreshes `doc` before its certificate chain expires. `hpke_pk` does
 
 ### Attestation document
 
-This is an EC2 NitroTPM attestation document: CBOR, a COSE_Sign1 with tag 18 and protected header `{1: -35}` (ECDSA P-384 with SHA-384). Its payload is a map with these text keys:
+This is an EC2 NitroTPM attestation document: CBOR, a COSE_Sign1 with protected header `{1: -35}` (ECDSA P-384 with SHA-384) and an empty unprotected header. Its payload is a map with these text keys:
 
 | Key | Type | Use |
 |-----|------|-----|
@@ -44,10 +44,18 @@ This is an EC2 NitroTPM attestation document: CBOR, a COSE_Sign1 with tag 18 and
 | `user_data` | bstr | **The channel key binding: exactly the 65 bytes of `hpke_pk`** |
 | `nonce` | bstr or null | Not used |
 
-The dev build emits documents in this same format, signed under a throwaway dev root. Optional fields that are absent are encoded as CBOR `null`.
+Optional fields that are absent are encoded as CBOR `null`.
+
+The encoding, as real instances produce it:
+
+- The COSE_Sign1 is **untagged**. A parser also accepts tag 18, which the AWS documentation describes, and rejects any other tag.
+- The payload map has **indefinite length** (RFC 8949 §3.2.2). A parser accepts definite and indefinite lengths for every map and array. In the recorded real document, every other item has a definite length.
+- Byte and text strings have definite length. A parser may reject indefinite-length strings.
+
+The dev build emits documents in this same format and encoding, signed under a throwaway dev root.
 
 > [!NOTE]
-> The field layout comes from AWS documentation. See [`external-notes.md`](external-notes.md) for what is still unconfirmed against a real instance.
+> This layout was confirmed against a real instance on 2026-11-24 ([`external-notes.md`](external-notes.md)). [`vectors/attestation.json`](vectors/attestation.json) is that document.
 
 ### Verification by the login page
 

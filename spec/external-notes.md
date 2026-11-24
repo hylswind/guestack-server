@@ -7,8 +7,8 @@
 | Topic | State |
 |-------|-------|
 | [Telegram login](#telegram-login) | Checked, including the blocking nonce check |
-| [EC2 instance attestation (NitroTPM)](#ec2-instance-attestation-nitrotpm) | Documentation checked. Open items wait for a real instance |
-| [GitHub artifact attestations](#github-artifact-attestations) | Documentation checked. One open item waits for the first workflow run |
+| [EC2 instance attestation (NitroTPM)](#ec2-instance-attestation-nitrotpm) | Checked, including a real instance. Burstable instance types cannot attest |
+| [GitHub artifact attestations](#github-artifact-attestations) | Checked, including the first workflow runs |
 | [HPKE in Go](#hpke-in-go) | Checked |
 | [No runtime configuration](#no-runtime-configuration) | Checked |
 | [`encoding/json`](#encodingjson) | Accepted behaviour |
@@ -52,7 +52,7 @@
 
 ### Checked
 
-- The document is a CBOR COSE_Sign1 with tag 18 and protected header `{1: -35}` (ECDSA P-384), and an empty unprotected header.
+- The documentation describes the document as a CBOR COSE_Sign1 with tag 18, protected header `{1: -35}` (ECDSA P-384), and an empty unprotected header. A real document is untagged ([below](#checked-on-a-real-instance)).
 - Payload: `module_id` (text), `timestamp` (uint, ms), `digest` = `"SHA384"`, `nitrotpm_pcrs` (index 0..31 → 32/48/64-byte bstr), `certificate` (DER), `cabundle` (array of DER), optional `public_key`, `user_data`, `nonce` (bstr, 0..1024 bytes).
 - "An Attestation Document will always have their CA bundle in the following order": `[ROOT_CERT, INTERM_1, …, INTERM_N]`. **Root first**, and the leaf is not included.
 - Validation: check the chain at the current date, with CRL checks disabled.
@@ -72,14 +72,24 @@ Read on 2026-11-24 in the source of `aws/NitroTPM-Tools` at tag `v1.1.2`, the ve
 - `amazon-ec2-net-utils` reads the instance metadata service, for example in `set-hostname-imds` and `setup-policy-routes`. It is excluded from the image. Its DHCP configuration, `80-ec2.network` at tag `v2.7.7`, is copied unchanged.
 - `amazon-chrony-config` stays in the image, as in the AWS example. It chooses the time sources at boot and every 30 minutes: NTP servers from the DHCP lease if there are any, otherwise the Amazon link-local source and a public Amazon pool, picked with the AWS partition from the instance metadata service. The operator can therefore influence the instance clock, which this design treats as untrusted input.
 
-### Open
+### Checked on a real instance
 
-Waiting for a real instance:
+On 2026-11-24, an `m5.large` instance in `us-east-1` booted the image built from commit `f9c5425` and served `GET /attestation`. [`vectors/attestation.json`](vectors/attestation.json) is the document it returned.
 
-- [ ] Leaf certificate validity period. It is not documented, and it sets the backend's refresh interval for `/attestation`.
-- [ ] Whether the document is tagged, and whether absent optional fields are `null` or omitted. The dev build emits a tagged document with `null`.
-- [ ] Whether `user_data` arrives in the document unchanged.
-- [ ] Whether the PCR4, PCR7, and PCR12 an instance reports equal the computed values. The image uses standard boot, and the AWS documentation names PCR7 only for Secure Boot.
+- The COSE_Sign1 is **untagged**, unlike what the documentation describes. Its protected header is `{1: -35}`, and its unprotected header is an empty map.
+- The payload is an **indefinite-length map**. Every other item has a definite length. The keys, in order: `module_id`, `digest`, `timestamp`, `nitrotpm_pcrs`, `certificate`, `cabundle`, `public_key`, `user_data`, `nonce`.
+- `public_key` and `nonce`, which the backend does not request, are CBOR `null`.
+- `nitrotpm_pcrs` holds the indices 0 to 23, 48 bytes each.
+- `cabundle` holds the root and three intermediates, root first, and the root's SHA-256 is the published fingerprint. The intermediates live 20 days, 6 days, and 1 day. **The leaf lives 3 hours** and is issued when the document is requested. The backend refreshes the document every 10 minutes.
+- `user_data` is exactly the 65-byte `hpke_pk`, unchanged.
+- PCR4, PCR7, and PCR12 equal the `measurements.json` of that build, although the image boots without Secure Boot and the documentation names PCR7 only for Secure Boot.
+- `guestackd`, running as `tss` and passing the key through `/dev/stdin`, obtains documents.
+
+### Instance types
+
+`nitro-tpm-attest` 1.1.2 cannot produce a document on burstable instance types. It defines an 8192-byte NV index for each request, and the NitroTPM of `t3` and `t4g` instances allows at most 2048 bytes (`TPM2_PT_NV_INDEX_MAX`). The request fails with `TPM_RC_SIZE` (`0x2d5`), as root and as `tss` alike. This was reproduced on `t3.small` on 2026-11-24 and matches the upstream issue aws/NitroTPM-Tools#7.
+
+The AWS documentation lists T3 and T4g as supporting NitroTPM. That holds for the TPM itself, not for attestation. Use a non-burstable type, such as `m5.large`.
 
 ## GitHub artifact attestations
 
@@ -90,12 +100,7 @@ Waiting for a real instance:
 - The action needs the permissions `id-token: write`, `attestations: write`, and `artifact-metadata: write`. Without a predicate input it produces SLSA build provenance.
 - Attestations in private or internal repositories need GitHub Enterprise Cloud. Public repositories use the Sigstore public-good instance.
 - `gh attestation verify` can require the repository (`--repo`), the signing workflow (`--signer-workflow`), the source ref (`--source-ref`), and a GitHub-hosted runner (`--deny-self-hosted-runners`).
-
-### Open
-
-Waiting for the first workflow run:
-
-- [ ] The JSON path of the source commit used in [`VERIFY.md`](../VERIFY.md), checked against a real attestation.
+- On the first workflow runs (2026-11-24), `gh attestation verify --format json` put the source commit at `.[0].verificationResult.signature.certificate.sourceRepositoryDigest`, the path [`VERIFY.md`](../VERIFY.md) uses.
 
 ## HPKE in Go
 

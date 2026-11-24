@@ -7,7 +7,7 @@ Websites receive a pseudonymous **guest ID** instead of a phone number. The same
 This repository contains `guestackd`, the Go service that checks the Telegram login and issues a signed **identity token**, along with the protocol specifications and test vectors that the other Guestack components conform to. It is public so that anyone can audit what runs inside the attested instance.
 
 > [!WARNING]
-> **Not ready for production.** The dev build works end to end. NitroTPM attestation and the machine image exist but have not yet been verified on a real instance.
+> **Not ready for production.** The dev build works end to end. On a real instance, the machine image boots and serves attestation documents that verify against the AWS root and the build's PCRs. A real Telegram login and signing with the KMS issuer key have not yet been tested there.
 
 ## Features
 

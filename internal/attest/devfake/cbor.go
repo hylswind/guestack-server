@@ -41,5 +41,8 @@ func (e *cbor) bytes(b []byte) { e.head(2, uint64(len(b))); e.b = append(e.b, b.
 func (e *cbor) text(s string)  { e.head(3, uint64(len(s))); e.b = append(e.b, s...) }
 func (e *cbor) array(n int)    { e.head(4, uint64(n)) }
 func (e *cbor) mapHead(n int)  { e.head(5, uint64(n)) }
-func (e *cbor) tag(n uint64)   { e.head(6, n) }
 func (e *cbor) null()          { e.b = append(e.b, 0xf6) }
+
+// mapStart begins an indefinite-length map, which end closes.
+func (e *cbor) mapStart() { e.b = append(e.b, 0xbf) }
+func (e *cbor) end()      { e.b = append(e.b, 0xff) }

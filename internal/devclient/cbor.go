@@ -5,8 +5,9 @@ package devclient
 import "errors"
 
 // A minimal CBOR decoder (RFC 8949), enough to read the attestation
-// documents devfake produces. Dev only. Defending against malicious CBOR is
-// the job of the login page, which verifies real documents, not of this test helper.
+// documents devfake produces and real NitroTPM documents, whose payload is an
+// indefinite-length map. Dev only. Defending against malicious CBOR is the job
+// of the login page, which verifies real documents, not of this test helper.
 
 var errCBOR = errors.New("cbor: malformed")
 
@@ -49,6 +50,9 @@ func (d *decoder) item() (any, error) {
 	if head[0] == 0xf6 {
 		return nil, nil // null
 	}
+	if ai == 31 && (major == 4 || major == 5) {
+		return d.indefinite(major)
+	}
 	var n uint64
 	switch {
 	case ai < 24:
@@ -62,7 +66,7 @@ func (d *decoder) item() (any, error) {
 			n = n<<8 | uint64(c)
 		}
 	default:
-		return nil, errCBOR // indefinite lengths are not used
+		return nil, errCBOR // indefinite-length strings are not used
 	}
 	switch major {
 	case 0:
@@ -104,4 +108,36 @@ func (d *decoder) item() (any, error) {
 		return Tag{Number: n, Content: v}, err
 	}
 	return nil, errCBOR
+}
+
+// indefinite reads the items of an indefinite-length array (major 4) or map
+// (major 5) up to the break byte 0xff.
+func (d *decoder) indefinite(major byte) (any, error) {
+	var arr []any
+	m := map[any]any{}
+	for {
+		if d.off >= len(d.b) {
+			return nil, errCBOR
+		}
+		if d.b[d.off] == 0xff {
+			d.off++
+			if major == 4 {
+				return arr, nil
+			}
+			return m, nil
+		}
+		k, err := d.item()
+		if err != nil {
+			return nil, err
+		}
+		if major == 4 {
+			arr = append(arr, k)
+			continue
+		}
+		v, err := d.item()
+		if err != nil {
+			return nil, err
+		}
+		m[k] = v
+	}
 }

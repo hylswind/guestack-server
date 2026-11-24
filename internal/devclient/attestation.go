@@ -31,11 +31,15 @@ func VerifyAttestation(doc, hpkePK []byte, pins Pins, now time.Time) error {
 	if err != nil {
 		return ErrAttestation
 	}
-	tag, ok := v.(Tag)
-	if !ok || tag.Number != 18 {
-		return ErrAttestation
+	// Documents are untagged. Tag 18, which the AWS documentation describes,
+	// is also accepted.
+	if tag, ok := v.(Tag); ok {
+		if tag.Number != 18 {
+			return ErrAttestation
+		}
+		v = tag.Content
 	}
-	arr, ok := tag.Content.([]any)
+	arr, ok := v.([]any)
 	if !ok || len(arr) != 4 {
 		return ErrAttestation
 	}

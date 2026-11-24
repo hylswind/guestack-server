@@ -60,8 +60,10 @@ func (p *Provider) Document(_ context.Context, userData []byte) ([]byte, error) 
 		return nil, attest.ErrUnavailable
 	}
 
+	// Encoded as a real instance encodes it: an indefinite-length payload
+	// map with the keys in this order, in an untagged COSE_Sign1.
 	var pl cbor
-	pl.mapHead(9)
+	pl.mapStart()
 	pl.text("module_id")
 	pl.text(devkeys.Marker)
 	pl.text("digest")
@@ -86,6 +88,7 @@ func (p *Provider) Document(_ context.Context, userData []byte) ([]byte, error) 
 	pl.bytes(userData)
 	pl.text("nonce")
 	pl.null()
+	pl.end()
 
 	var prot cbor
 	prot.mapHead(1)
@@ -109,7 +112,6 @@ func (p *Provider) Document(_ context.Context, userData []byte) ([]byte, error) 
 	s.FillBytes(sig[48:])
 
 	var doc cbor
-	doc.tag(18)
 	doc.array(4)
 	doc.bytes(prot.b)
 	doc.mapHead(0)

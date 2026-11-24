@@ -32,6 +32,20 @@ func TestDevDocumentVerifies(t *testing.T) {
 	}
 }
 
+func TestAttestationTags(t *testing.T) {
+	doc, pk := devDoc(t)
+	if doc[0] != 0x84 {
+		t.Fatal("dev document is not an untagged COSE_Sign1")
+	}
+	// 0xd2 is tag 18 (COSE_Sign1); 0xd3 is tag 19.
+	if err := VerifyAttestation(append([]byte{0xd2}, doc...), pk, DevPins(), time.Now()); err != nil {
+		t.Errorf("tag 18 rejected: %v", err)
+	}
+	if VerifyAttestation(append([]byte{0xd3}, doc...), pk, DevPins(), time.Now()) == nil {
+		t.Error("tag 19 accepted")
+	}
+}
+
 func TestAttestationNegative(t *testing.T) {
 	doc, pk := devDoc(t)
 	now := time.Now()
